@@ -124,6 +124,27 @@ CREATE INDEX idx_loans ON Loans (Last, First)
 
 SELECT * FROM Loans
 
+-- Format (media format... i.e. paperback, dvd, bluray, etc.)
+
+DROP TABLE IF EXISTS Formats;
+
+CREATE TABLE Formats (
+		Name		varchar(50),
+		Note		varchar(255),
+		FormatId	SERIAL PRIMARY KEY
+);
+
+CREATE INDEX ix_fname ON Formats (Name);
+
+INSERT INTO Formats
+VALUES 	('Paperback', 'Inexpensive paper book'),
+		('Trade Paperback', 'Large format paperback book'),
+		('Hardback', 'Expensive bound paper book'),
+		('eBook', 'Electronic book'),
+		('Audio Book', 'Electronic audio book');
+
+SELECT * FROM Formats ORDER BY FormatId
+
 -- Books
 
 DROP TABLE IF EXISTS Books;
@@ -135,6 +156,7 @@ CREATE TABLE Books (
 	PubDate	date,
 	LoanId	bigint REFERENCES Loans (Loan) NULL,
 	GroupId	bigint REFERENCES Groups (GroupId) NULL,
+	FormatId bigint REFERENCES Formats (FormatId) NULL,
 	Note	varchar(255) NULL,
 	Book    SERIAL PRIMARY KEY
 );
@@ -143,32 +165,36 @@ CREATE INDEX ix_title ON Books (Title);
 
 INSERT INTO Books 
 VALUES ('978-0-7653-4827-2', 'Old Man''s War', 1, '1/1/2005',
-        NULL, 1, 'Fun with John and Jane Perry.'),
+        NULL, 1, 1, 'Fun with John and Jane Perry.'),
         ('0-672-32642-6', 'Linux Shell Scripting With Bash',
-         NULL, '2/1/2004', NULL, NULL, '#!/bin/bash'),
+         NULL, '2/1/2004', NULL, NULL, 2, '#!/bin/bash'),
         ('978-0-7653-5406-8', 'The Ghost Brigades', 1, '1/1/2006',
-         NULL, 1, 'More fun with John and Jane Perry.'),
+         NULL, 1, 1, 'More fun with John, Jane Perry and Zoe.'),
         ('987-0-6543-2109-8', 'Test Data Vol. 1', 3, '1/1/2026', 
-         NULL, 3, 'Some Test Data.');
+         NULL, 3, 3, 'Some Test Data.');
 
-UPDATE Books SET GroupID = 2 WHERE Book = 2;
-UPDATE Books Set AuthorId = 2 WHERE Book = 2;
+UPDATE Books SET FormatId = 1 WHERE Book IN(1, 3);
+UPDATE Books SET FormatId = 2 WHERE Book IN(2, 4);
+
 
 SELECT * FROM Books;
+
+--ALTER TABLE Books ADD FormatId bigint REFERENCES Formats (FormatID) NULL;
 
 -- Test and validations
 
 SELECT * FROM Groups;
 SELECT * FROM Books ORDER BY Title;
+SELECT * FROM Books ORDER BY Book;
 SELECT * FROM Authors ORDER BY Last, First;
 SELECT * FROM Groups ORDER BY Name;
-SELECT * FROM Addresses ORDER BY Address;
  
 --Make sure we can join on the authors and groups table
-SELECT  b.Title, a.First, a.Last, b.ISBN, b.Book, a.Author, 
+SELECT  b.Title, a.First, a.Last, b.ISBN, b.Book, f.Name AS Format, f.FormatId, a.Author, 
         g.GroupId, g.Name as Group, a.Web, a.EMail
 FROM Books AS b
 INNER JOIN Authors AS a ON b.AuthorId = a.Author
+LEFT JOIN Formats AS f ON b.FormatId = f.FormatId
 LEFT JOIN Groups AS g ON b.GroupId = g.GroupId
 WHERE b.authorid IS NOT NULL
 ORDER BY b.Title;
