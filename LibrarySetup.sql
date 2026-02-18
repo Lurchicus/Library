@@ -87,6 +87,10 @@ VALUES  ('John', 'Scalzi', 'https://whatever.scalzi.com/',
         ('Irma', 'Fake', 'https://www.psudeo.nym', 
          'floof@psudeo.nym', NULL, NULL, NULL, NULL, 1, 
          'Bash stuff');
+INSERT INTO Authors
+VALUES  ('Anne', 'McCaffrey', NULL,
+         NULL, NULL, NULL, NULL, NULL, NULL, 
+         'Dragonriders of Pern, Harper Hall, Crystal Singer');
 
 SELECT * FROM Authors;         
 
@@ -103,6 +107,8 @@ INSERT INTO Groups
 VALUES ('Old Man''s War'),
        ('Tech - Linux'),
        ('Test Data');
+INSERT INTO Groups
+VALUES ('Pern');
 
 SELECT * FROM Groups;
 
@@ -176,6 +182,9 @@ VALUES ('978-0-7653-4827-2', 'Old Man''s War', 1, '1/1/2005',
 UPDATE Books SET FormatId = 1 WHERE Book IN(1, 3);
 UPDATE Books SET FormatId = 2 WHERE Book IN(2, 4);
 
+INSERT INTO Books 
+VALUES ('978-', 'Old Man''s War', 1, '1/1/2005',
+        NULL, 1, 1, 'Fun with John and Jane Perry.')
 
 SELECT * FROM Books;
 
